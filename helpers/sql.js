@@ -2,7 +2,7 @@ const { BadRequestError } = require("../expressError");
 
 /** Create SQL to update whatever fields are provided in the data.
  *
- * dataToUpdate is a JS property that represents a SQL field;
+ * dataToUpdate is an object containing JS properties that represent SQL fields;
  * for example: {name, description, numEmployees, logoUrl}
  *
  * jsToSql: an object that matches up JS properties to SQL fields if they are 
