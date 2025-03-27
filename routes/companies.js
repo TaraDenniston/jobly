@@ -52,7 +52,8 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   try {
-    const companies = await Company.findAll();
+    const nameLike = req.query.nameLike;
+    const companies = await Company.find(nameLike);
     return res.json({ companies });
   } catch (err) {
     return next(err);
