@@ -61,7 +61,8 @@ class Company {
     return companiesRes.rows;
   }
 
-  /** Find companies based on optional filter results.
+  /** Find companies based on optional filters. If no filters are provided, 
+   * return all companies.
    * 
    * Optional filters:
    *   - nameLike (case-insensitive, partial matches)
@@ -71,7 +72,12 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async find( nameLike ) {
+  static async find( {nameLike, minEmployees, maxEmployees} = {}) {
+    // Check to make sure minEmployees isn't greater than maxEmployees
+    if (minEmployees > maxEmployees) {
+      throw new BadRequestError("minEmployees cannot be greater than maxEmployees");
+    }
+
     // Base query
     let query = `SELECT handle,
                         name,
@@ -79,15 +85,29 @@ class Company {
                         num_employees AS "numEmployees",
                         logo_url AS "logoUrl"
                 FROM companies`;
+    const whereClauses = [];
     const values = [];
 
-    // If name is provided, update query and values
+    // If filters are provided, update whereClauses and values
     if (nameLike) {
-      query += " WHERE name ILIKE $1"
       values.push(`%${nameLike}%`);
+      whereClauses.push(`name ILIKE $${values.length}`);
+    }
+    if (minEmployees !== undefined) {
+      values.push(minEmployees);
+      whereClauses.push(`num_employees >= $${values.length}`);
+    }
+    if (maxEmployees !== undefined) {
+      values.push(maxEmployees);
+      whereClauses.push(`num_employees <= $${values.length}`);
     }
 
-    // Add clause to query to order by name
+    // Add WHERE clauses to query if there are any filters
+    if (whereClauses.length > 0) {
+      query += " WHERE " + whereClauses.join(" AND ");
+    }
+
+    // Add ORDER BY clause to query
     query += " ORDER BY name";
 
     const companiesRes = await db.query(query, values);

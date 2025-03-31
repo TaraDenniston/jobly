@@ -52,8 +52,25 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   try {
-    const nameLike = req.query.nameLike;
-    const companies = await Company.find(nameLike);
+    const { nameLike, minEmployees, maxEmployees } = req.query;
+
+    // Validate query parameters
+    if (minEmployees !== undefined && isNaN(Number(minEmployees))) {
+      throw new BadRequestError("minEmployees must be a number");
+    }
+    if (maxEmployees !== undefined && isNaN(Number(maxEmployees))) {
+      throw new BadRequestError("maxEmployees must be a number");
+    }
+
+    // Add query parameters to filters
+    const filters = {
+      nameLike,
+      minEmployees: minEmployees !== undefined ? minEmployees : undefined,
+      maxEmployees: maxEmployees !== undefined ? maxEmployees : undefined
+    };
+
+    // Send request using filters
+    const companies = await Company.find(filters);
     return res.json({ companies });
   } catch (err) {
     return next(err);
