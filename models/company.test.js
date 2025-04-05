@@ -56,7 +56,7 @@ describe("create", function () {
   });
 });
 
-/************************************** findAll */
+/************************************** find */
 
 describe("find", function () {
   test("works with no filters", async function () {
@@ -85,6 +85,86 @@ describe("find", function () {
       },
       
     ]);
+  });
+  test("works with nameLike filter", async function () {
+    let companies = await Company.find({ nameLike: "net" });
+    expect(companies).toEqual([
+      {
+        handle: "c3",
+        name: "AnotherNet",
+        description: "Desc3",
+        numEmployees: 200,
+        logoUrl: "http://c3.img",
+      },
+      {
+        handle: "c2",
+        name: "NetCompany",
+        description: "Desc2",
+        numEmployees: 100,
+        logoUrl: "http://c2.img",
+      }
+    ]);
+  });
+  test("works with minEmployees filter", async function () {
+    let companies = await Company.find({ minEmployees: 100 });
+    expect(companies).toEqual([
+      {
+        handle: "c3",
+        name: "AnotherNet",
+        description: "Desc3",
+        numEmployees: 200,
+        logoUrl: "http://c3.img",
+      },
+      {
+        handle: "c2",
+        name: "NetCompany",
+        description: "Desc2",
+        numEmployees: 100,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+  test("works with maxEmployees filter", async function () {
+    let companies = await Company.find({ maxEmployees: 99 });
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "Company1",
+        description: "Desc1",
+        numEmployees: 50,
+        logoUrl: "http://c1.img",
+      },
+    ]);
+  });
+  test("works with all filters", async function () {
+    let companies = await Company.find(
+      {
+        nameLike: "net",
+        minEmployees: 50,
+        maxEmployees: 150,
+      }
+    );
+    expect(companies).toEqual([
+      {
+        handle: "c2",
+        name: "NetCompany",
+        description: "Desc2",
+        numEmployees: 100,
+        logoUrl: "http://c2.img",
+      },
+    ]);
+  });
+  test("throws error if minEmployees > maxEmployees", async () => {
+    try {
+      let resp = await Company.find(
+        { 
+          minEmployees: 200, 
+          maxEmployees: 100 
+        }
+      );
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
   });
 });
 
