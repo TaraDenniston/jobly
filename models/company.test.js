@@ -63,6 +63,13 @@ describe("find", function () {
     let companies = await Company.find();
     expect(companies).toEqual([
       {
+        handle: "c3",
+        name: "AnotherNet",
+        description: "Desc3",
+        numEmployees: 200,
+        logoUrl: "http://c3.img",
+      },
+      {
         handle: "c1",
         name: "Company1",
         description: "Desc1",
@@ -76,13 +83,7 @@ describe("find", function () {
         numEmployees: 100,
         logoUrl: "http://c2.img",
       },
-      {
-        handle: "c3",
-        name: "AnotherNet",
-        description: "Desc3",
-        numEmployees: 200,
-        logoUrl: "http://c3.img",
-      },
+      
     ]);
   });
 });
