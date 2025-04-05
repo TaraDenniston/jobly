@@ -73,23 +73,23 @@ describe("GET /companies", function () {
           [
             {
               handle: "c1",
-              name: "C1",
+              name: "Company1",
               description: "Desc1",
-              numEmployees: 1,
+              numEmployees: 50,
               logoUrl: "http://c1.img",
             },
             {
               handle: "c2",
-              name: "C2",
+              name: "NetCompany",
               description: "Desc2",
-              numEmployees: 2,
+              numEmployees: 100,
               logoUrl: "http://c2.img",
             },
             {
               handle: "c3",
-              name: "C3",
+              name: "AnotherNet",
               description: "Desc3",
-              numEmployees: 3,
+              numEmployees: 200,
               logoUrl: "http://c3.img",
             },
           ],
@@ -116,9 +116,9 @@ describe("GET /companies/:handle", function () {
     expect(resp.body).toEqual({
       company: {
         handle: "c1",
-        name: "C1",
+        name: "Company1",
         description: "Desc1",
-        numEmployees: 1,
+        numEmployees: 50,
         logoUrl: "http://c1.img",
       },
     });
@@ -129,9 +129,9 @@ describe("GET /companies/:handle", function () {
     expect(resp.body).toEqual({
       company: {
         handle: "c2",
-        name: "C2",
+        name: "NetCompany",
         description: "Desc2",
-        numEmployees: 2,
+        numEmployees: 100,
         logoUrl: "http://c2.img",
       },
     });
@@ -158,7 +158,7 @@ describe("PATCH /companies/:handle", function () {
         handle: "c1",
         name: "C1-new",
         description: "Desc1",
-        numEmployees: 1,
+        numEmployees: 50,
         logoUrl: "http://c1.img",
       },
     });
