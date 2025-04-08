@@ -66,7 +66,7 @@ describe("POST /companies", function () {
 /************************************** GET /companies */
 
 describe("GET /companies", function () {
-  test("ok for anon", async function () {
+  test("works with no filters", async function () {
     const resp = await request(app).get("/companies");
     expect(resp.body).toEqual({
       companies:
@@ -94,6 +94,47 @@ describe("GET /companies", function () {
             },
           ],
     });
+  });
+
+  test("works with valid filters", async function () {
+    const resp = await request(app).get("/companies").query({
+      nameLike: "C",
+      minEmployees: 2,
+      maxEmployees: 3,
+    });
+    expect(resp.body).toEqual({
+      companies: [
+        {
+          handle: "c2",
+          name: "C2",
+          description: "Desc2",
+          numEmployees: 2,
+          logoUrl: "http://c2.img",
+        },
+        {
+          handle: "c3",
+          name: "C3",
+          description: "Desc3",
+          numEmployees: 3,
+          logoUrl: "http://c3.img",
+        },
+      ],
+    });
+  });
+
+  test("bad request with invalid minEmployees", async function () {
+    const resp = await request(app).get("/companies").query({
+      minEmployees: "one",
+    });
+    expect(resp.statusCode).toEqual(400);
+  });
+  
+  test("bad request with minEmployees > maxEmployees", async function () {
+    const resp = await request(app).get("/companies").query({
+      minEmployees: 5,
+      maxEmployees: 3,
+    });
+    expect(resp.statusCode).toEqual(400);
   });
 
   test("fails: test next() handler", async function () {
