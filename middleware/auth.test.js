@@ -5,12 +5,14 @@ const { UnauthorizedError } = require("../expressError");
 const {
   authenticateJWT,
   ensureLoggedIn,
+  ensureAdmin
 } = require("./auth");
 
 
 const { SECRET_KEY } = require("../config");
 const testJwt = jwt.sign({ username: "test", isAdmin: false }, SECRET_KEY);
 const badJwt = jwt.sign({ username: "test", isAdmin: false }, "wrong");
+const testAdminJwt = jwt.sign({ username: "test", isAdmin: true }, SECRET_KEY);
 
 
 describe("authenticateJWT", function () {
@@ -76,5 +78,28 @@ describe("ensureLoggedIn", function () {
       expect(err instanceof UnauthorizedError).toBeTruthy();
     };
     ensureLoggedIn(req, res, next);
+  });
+});
+
+
+describe("ensureAdmin", function () {
+  test("works", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { username: "test", isAdmin: true } } };
+    const next = function (err) {
+      expect(err).toBeFalsy();
+    };
+    ensureAdmin(req, res, next);
+  });
+
+  test("unauth if not admin", function () {
+    expect.assertions(1);
+    const req = {};
+    const res = { locals: { user: { username: "test", is_admin: false } } };
+    const next = function (err) {
+      expect(err instanceof UnauthorizedError).toBeTruthy();
+    };
+    ensureAdmin(req, res, next);
   });
 });
