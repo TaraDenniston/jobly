@@ -8,12 +8,20 @@ async function commonBeforeAll() {
   await db.query("DELETE FROM companies");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users");
+  // noinspection SqlWithoutWhere
+  await db.query("DELETE FROM jobs");
 
   await db.query(`
     INSERT INTO companies(handle, name, num_employees, description, logo_url)
     VALUES ('c1', 'Company1', 50, 'Desc1', 'http://c1.img'),
            ('c2', 'NetCompany', 100, 'Desc2', 'http://c2.img'),
            ('c3', 'AnotherNet', 200, 'Desc3', 'http://c3.img')`);
+
+  await db.query(`
+  INSERT INTO jobs(title, salary, equity, company_handle)
+  VALUES ('t1', '50000', 50, '0.050', 'c1'),
+          ('t2', '90000', 100, '0.095', 'c1'),
+          ('t3', '150000', 200, '0.001', 'c2')`);
 
   await db.query(`
         INSERT INTO users(username,
