@@ -49,3 +49,112 @@ describe("create", function () {
   });
 
 });
+
+
+/************************************** find */
+
+describe("find", function () {
+  test("works with no filters", async function () {
+    let jobs = await Job.find();
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "t1-a",
+        salary: 50000,
+        equity: "0.050",
+        companyHandle: "c1",
+      },
+      {
+        id: expect.any(Number),
+        title: "t2-a",
+        salary: 90000,
+        equity: "0.095",
+        companyHandle: "c1",
+      },
+      {
+        id: expect.any(Number),
+        title: "t3-b",
+        salary: 150000,
+        equity: "0",
+        companyHandle: "c2",
+      },
+    ]);
+  });
+  test("works with titleLike filter", async function () {
+    let jobs = await Job.find({ titleLike: "a" });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "t1-a",
+        salary: 50000,
+        equity: "0.050",
+        companyHandle: "c1",
+      },
+      {
+        id: expect.any(Number),
+        title: "t2-a",
+        salary: 90000,
+        equity: "0.095",
+        companyHandle: "c1",
+      },
+    ]);
+  });
+  test("works with minSalary filter", async function () {
+    let jobs = await Job.find({ minSalary: 70000 });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "t2-a",
+        salary: 90000,
+        equity: "0.095",
+        companyHandle: "c1",
+      },
+      {
+        id: expect.any(Number),
+        title: "t3-b",
+        salary: 150000,
+        equity: "0",
+        companyHandle: "c2",
+      },
+    ]);
+  });
+  test("works with hasEquity filter", async function () {
+    let jobs = await Job.find({ hasEquity: true });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "t1-a",
+        salary: 50000,
+        equity: "0.050",
+        companyHandle: "c1",
+      },
+      {
+        id: expect.any(Number),
+        title: "t2-a",
+        salary: 90000,
+        equity: "0.095",
+        companyHandle: "c1",
+      },
+    ]);
+  });
+  test("works with multiple filters", async function () {
+    let jobs = await Job.find({ titleLike: "a", minSalary: 60000, hasEquity: true });
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: "t2-a",
+        salary: 90000,
+        equity: "0.095",
+        companyHandle: "c1",
+      },
+    ]);
+  });
+  test("throws BadRequestError if minSalary is not a number", async function () {
+    try {
+      await Job.find({ minSalary: "not-a-number" });
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+
+});
