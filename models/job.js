@@ -49,6 +49,60 @@ class Job {
 
     return job;
   }
+
+
+  /** Find jobs based on optional filters. If no filters are provided, 
+   * return all jobs.
+   * 
+   * Optional filters:
+   *   - titleLike (case-insensitive, partial matches)
+   *   - minSalary (minimum salary amount)
+   *   - hasEquity (if true: jobs with non-zero equity; if false or 
+   *       absent: all jobs)
+   *
+   * Returns [{ id, title, salary, equity, companyHandle }, ...]
+   * */
+
+  static async find( {titleLike, minSalary, hasEquity} = {}) {
+    // Data validation for minSalary 
+    if (minSalary !== undefined && typeof minSalary !== "number") {
+      throw new BadRequestError(`minSalary must be a number: ${minSalary}`);
+    }
+
+    // Base query
+    let query = `SELECT id,
+                        title,
+                        salary,
+                        equity,
+                        company_handle AS "companyHandle"
+                FROM jobs`;
+    const whereClauses = [];
+    const values = [];
+
+    // If filters are provided, update whereClauses and values
+    if (titleLike) {
+      values.push(`%${titleLike}%`);
+      whereClauses.push(`title ILIKE $${values.length}`);
+    }
+    if (minSalary !== undefined) {
+      values.push(minSalary);
+      whereClauses.push(`salary >= $${values.length}`);
+    }
+    if (hasEquity) {
+      whereClauses.push(`equity > 0`);
+    }
+
+    // Add WHERE clauses to query if there are any filters
+    if (whereClauses.length > 0) {
+      query += " WHERE " + whereClauses.join(" AND ");
+    }
+
+    // Add ORDER BY clause to query
+    query += " ORDER BY id";
+
+    const jobsRes = await db.query(query, values);
+    return jobsRes.rows;
+  }
 }
 
 module.exports = Job;
