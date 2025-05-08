@@ -9,6 +9,7 @@ const {
   commonAfterEach,
   commonAfterAll,
 } = require("./_testCommon");
+const e = require("cors");
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -156,5 +157,27 @@ describe("find", function () {
       expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
+});
 
+/************************************** get */
+
+describe("get", function () {
+  test("works", async function () {
+    let t1Job = await Job.find({ titleLike: "t1" });
+    let job = await Job.get(t1Job[0].id);
+    expect(job).toEqual({
+      id: expect.any(Number),
+      title: "t1-a",
+      salary: 50000,
+      equity: "0.050",
+      companyHandle: "c1",
+    });
+  });
+  test("not found if no such job", async function () {
+    try {
+      await Job.get(0);
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
 });
