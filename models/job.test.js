@@ -258,3 +258,22 @@ describe("update", function () {
     }
   });
 });
+
+/************************************** remove */
+describe("remove", function () {
+  test("works", async function () {
+    let t1Job = await Job.find({ titleLike: "t1" });
+    await Job.remove(t1Job[0].id);
+    const res = await db.query(
+        "SELECT id FROM jobs WHERE id=$1", [t1Job[0].id]);
+    expect(res.rows.length).toEqual(0);
+  });
+
+  test("not found if no such job", async function () {
+    try {
+      await Job.remove(0);
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
