@@ -3,7 +3,7 @@
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
-const { update } = require("./company");
+
 
 /** Related functions for jobs. */
 
@@ -185,5 +185,6 @@ class Job {
     if (!job) throw new NotFoundError(`No job: ${id}`);
   }
 }
+
 
 module.exports = Job;
