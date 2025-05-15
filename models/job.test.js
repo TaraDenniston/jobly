@@ -181,3 +181,80 @@ describe("get", function () {
     }
   });
 });
+
+/************************************** update */
+describe("update", function () {
+  const updateData = {
+    title: "new",
+    salary: 100000,
+    equity: "0.06",
+  };
+
+  test("works", async function () {
+    let t1Job = await Job.find({ titleLike: "t1" });
+    let job = await Job.update(t1Job[0].id, updateData);
+    expect(job).toEqual({
+      id: expect.any(Number),
+      ...updateData,
+      companyHandle: "c1",
+    });
+
+    const result = await db.query(
+          `SELECT title, salary, equity, company_handle
+           FROM jobs
+           WHERE id = $1`, [t1Job[0].id]);
+    expect(result.rows).toEqual([
+      {
+        title: "new",
+        salary: 100000,
+        equity: "0.06",
+        company_handle: "c1"
+      },
+    ]);
+  });
+
+  test("works: null fields", async function () {
+    let t1Job = await Job.find({ titleLike: "t1" });
+    const updateDataSetNull = {
+      title: "new",
+      salary: null,
+      equity: null,
+    };
+    let job = await Job.update(t1Job[0].id, updateDataSetNull);
+    expect(job).toEqual({
+      id: expect.any(Number),
+      ...updateDataSetNull,
+      companyHandle: "c1",
+    });
+
+    const result = await db.query(
+          `SELECT title, salary, equity, company_handle
+           FROM jobs
+           WHERE id = $1`, [t1Job[0].id]);
+    expect(result.rows).toEqual([
+      {
+        title: "new",
+        salary: null,
+        equity: null,
+        company_handle: "c1"
+      },
+    ]);
+  });
+
+  test("not found if no such job", async function () {
+    try {
+      await Job.update(0, updateData);
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("bad request with no data", async function () {
+    let t1Job = await Job.find({ titleLike: "t1" });
+    try {
+      await Job.update(t1Job[0].id, {});
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+});
