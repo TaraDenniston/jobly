@@ -188,3 +188,27 @@ describe("GET /jobs", function () {
     expect(resp.statusCode).toEqual(400);
   });
 });
+
+
+/************************************** GET /jobs/:id */
+
+describe("GET /jobs/:id", function () {
+  test("works for anon", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app).get(`/jobs/${j1Job.body.jobs[0].id}`);
+    expect(resp.body).toEqual({
+      job: {
+        id: expect.any(Number),
+        title: "J1",
+        salary: 50000,
+        equity: "0",
+        companyHandle: "c1"
+      }
+    });
+  });
+
+  test("not found for no such job", async function () {
+    const resp = await request(app).get(`/jobs/99999`);
+    expect(resp.statusCode).toEqual(404);
+  });
+});
