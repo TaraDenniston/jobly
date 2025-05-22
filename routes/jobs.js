@@ -38,5 +38,39 @@ router.post("/", ensureAdmin, async function (req, res, next) {
   }
 });
 
+/** GET /  =>
+ *   { jobs: [ { id, title, salary, equity, companyHandle }, ...] }
+ *
+ * Can filter on provided search filters:
+ * - title (will find case-insensitive, partial matches)
+ * - minSalary
+ * - hasEquity
+ *
+ * Authorization required: none
+ */
+router.get("/", async function (req, res, next) {
+  try {
+    const { titleLike, minSalary, hasEquity } = req.query;
+
+    // Validate query parameters
+    if (minSalary !== undefined && isNaN(Number(minSalary))) {
+      throw new BadRequestError("minSalary must be a number");
+    }
+
+    // Add query parameters to filters
+    const filters = {
+      titleLike,
+      minSalary: minSalary !== undefined ? Number(minSalary) : undefined,
+      hasEquity
+    };
+
+    // Send request using filters
+    const jobs = await Job.find(filters);
+    return res.json({ jobs });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 
 module.exports = router;
