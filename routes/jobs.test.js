@@ -288,3 +288,32 @@ describe("PATCH /jobs/:id", function () {
     expect(resp.statusCode).toEqual(400);
   });
 });
+
+
+/************************************** DELETE /jobs/:id */
+
+describe("DELETE /jobs/:id", function () {
+  test("works for admins", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .delete(`/jobs/${j1Job.body.jobs[0].id}`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.body).toEqual({ deleted: `${j1Job.body.jobs[0].id}` });
+  });
+
+  test("unauth for non-admins", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .delete(`/jobs/${j1Job.body.jobs[0].id}`)
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  test("not found for no such job", async function () {
+    const resp = await request(app)
+        .delete(`/jobs/99999`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(404);
+  });
+});
+
