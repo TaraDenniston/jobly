@@ -16,9 +16,6 @@
       "maximum": 1
     }
   },
-  "required": [
-    "title",
-    "salary",
-    "equity"
-  ]
+  "additionalProperties": false,
+  "required": []
 }
