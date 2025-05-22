@@ -212,3 +212,79 @@ describe("GET /jobs/:id", function () {
     expect(resp.statusCode).toEqual(404);
   });
 });
+
+
+/************************************** PATCH /jobs/:id */
+
+describe("PATCH /jobs/:id", function () {
+  test("works for admins", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .patch(`/jobs/${j1Job.body.jobs[0].id}`)
+        .send({
+          title: "New-J1",
+          salary: 100000,
+          equity: 0.01
+        })
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.body).toEqual({
+      job: {
+        id: expect.any(Number),
+        title: "New-J1",
+        salary: 100000,
+        equity: "0.01",
+        companyHandle: "c1"
+      }
+    });
+  });
+
+  test("unauth for non-admins", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .patch(`/jobs/${j1Job.body.jobs[0].id}`)
+        .send({
+          title: "New-J1",
+          salary: 100000,
+          equity: 0.01
+        })
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  test("not found on no such job", async function () {
+    const resp = await request(app)
+        .patch(`/jobs/99999`)
+        .send({
+          title: "New-J1",
+          salary: 100000,
+          equity: 0.01
+        })
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(404);
+  });
+
+  test("bad request on id change attempt", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .patch(`/jobs/${j1Job.body.jobs[0].id}`)
+        .send({
+          id: 99999,
+          title: "New-J1",
+          salary: 100000,
+          equity: 0.01
+        })
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("bad request with invalid data", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .patch(`/jobs/${j1Job.body.jobs[0].id}`)
+        .send({
+          salary: "not-a-number",
+        })
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(400);
+  });
+});
