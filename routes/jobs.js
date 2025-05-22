@@ -72,5 +72,21 @@ router.get("/", async function (req, res, next) {
   }
 });
 
+/** GET /[id]  =>  { job }
+ *
+ *  Job is { id, title, salary, equity, companyHandle }
+ *
+ * Authorization required: none
+ */
+router.get("/:id", async function (req, res, next) {
+  try {
+    const job = await Job.get(req.params.id);
+    return res.json({ job });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+
 
 module.exports = router;
