@@ -179,6 +179,20 @@ describe("get", function () {
       description: "Desc1",
       numEmployees: 50,
       logoUrl: "http://c1.img",
+      jobs: [
+        {
+          id: expect.any(Number),
+          title: "t1-a",
+          salary: 50000,
+          equity: "0.050"
+        },
+        {
+          id: expect.any(Number),
+          title: "t2-a",
+          salary: 90000,
+          equity: "0.095"
+        },
+      ]
     });
   });
 
