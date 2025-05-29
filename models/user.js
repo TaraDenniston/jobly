@@ -98,7 +98,7 @@ class User {
 
   /** Find all users.
    *
-   * Returns [{ username, first_name, last_name, email, is_admin }, ...]
+   * Returns [{ username, first_name, last_name, email, is_admin, jobs: [ ... ]}, ...]
    **/
 
   static async findAll() {
@@ -127,7 +127,7 @@ class User {
   /** Given a username, return data about user.
    *
    * Returns { username, first_name, last_name, is_admin, jobs }
-   *   where jobs is { id, title, company_handle, company_name, state }
+   *   where jobs includes list of job IDs the user has applied for
    *
    * Throws NotFoundError if user not found.
    **/
