@@ -239,6 +239,56 @@ describe("GET /users/:username", function () {
   });
 });
 
+/************************************** POST /users/:username/job/:jobId */
+
+describe("POST /users/:username/job/:jobId", function () {
+  test("works for admin users", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .post(`/users/u2/job/${j1Job.body.jobs[0].id}`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.body).toEqual({ applied: String(j1Job.body.jobs[0].id) });
+  });
+
+  test("works for correct user", async function () {
+    let j2Job = await request(app).get("/jobs").query({ titleLike: "J2" });
+    const resp = await request(app)
+        .post(`/users/u2/job/${j2Job.body.jobs[0].id}`)
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.body).toEqual({ applied: String(j2Job.body.jobs[0].id) });
+  });
+
+  test("unauth for incorrect user", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .post(`/users/u3/job/${j1Job.body.jobs[0].id}`)
+        .set("authorization", `Bearer ${u2Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  test("unauth for anon", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .post(`/users/u1/job/${j1Job.body.jobs[0].id}`);
+    expect(resp.statusCode).toEqual(401);
+  });
+
+  test("not found if user not found", async function () {
+    let j1Job = await request(app).get("/jobs").query({ titleLike: "J1" });
+    const resp = await request(app)
+        .post(`/users/nope/job/${j1Job.body.jobs[0].id}`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(404);
+  });
+
+  test("not found if job not found", async function () {
+    const resp = await request(app)
+        .post(`/users/u1/job/nope`)
+        .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(404);
+  });
+});
+
 /************************************** PATCH /users/:username */
 
 describe("PATCH /users/:username", () => {
