@@ -128,11 +128,26 @@ describe("GET /companies", function () {
     });
     expect(resp.statusCode).toEqual(400);
   });
+
+  test("bad request with invalid minEmployees", async function () {
+    const resp = await request(app).get("/companies").query({
+      minEmployees: null,
+    });
+    expect(resp.statusCode).toEqual(500);
+  });
   
   test("bad request with minEmployees > maxEmployees", async function () {
     const resp = await request(app).get("/companies").query({
       minEmployees: 5,
       maxEmployees: 3,
+    });
+    expect(resp.statusCode).toEqual(400);
+  });
+
+  test("bad request with minEmployees > maxEmployees", async function () {
+    const resp = await request(app).get("/companies").query({
+      minEmployees: -5,
+      maxEmployees: -3,
     });
     expect(resp.statusCode).toEqual(400);
   });

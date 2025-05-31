@@ -55,11 +55,11 @@ router.get("/", async function (req, res, next) {
     const { nameLike, minEmployees, maxEmployees } = req.query;
 
     // Validate query parameters
-    if (minEmployees !== undefined && isNaN(Number(minEmployees))) {
-      throw new BadRequestError("minEmployees must be a number");
+    if (minEmployees !== undefined && isNaN(Number(minEmployees)) || (Number(minEmployees) < 0)) {
+      throw new BadRequestError("minEmployees must be a positive number");
     }
-    if (maxEmployees !== undefined && isNaN(Number(maxEmployees))) {
-      throw new BadRequestError("maxEmployees must be a number");
+    if (maxEmployees !== undefined && isNaN(Number(maxEmployees)) || (Number(maxEmployees) < 0)) {
+      throw new BadRequestError("maxEmployees must be a positive number");
     }
 
     // Add query parameters to filters
