@@ -2,14 +2,16 @@ const { BadRequestError } = require("../expressError");
 
 /** Create SQL to update whatever fields are provided in the data.
  *
- * dataToUpdate is an object containing JS properties that represent SQL fields;
+ * dataToUpdate: an object containing properties that represent SQL fields;
  * for example: {name, description, numEmployees, logoUrl}
  *
- * jsToSql: an object that matches up JS properties to SQL fields if they are 
- * different; for example: { numEmployees: "num_employees", logoUrl: "logo_url" }
+ * jsToSql: an object that transforms name conventions of the fields from camel case 
+ * to snake case if they are different; for example: { numEmployees: "num_employees", 
+ * logoUrl: "logo_url" }
  * 
- * Returns object containing a string of column names and a string of new values;
- * for example: { setCols: "name, num_employees", values: "Anderson and Morrow, 190" }
+ * Returns object containing a string of column names and a string of new values (with 
+ * order maintained); for example: { setCols: "name, num_employees", values: "Anderson 
+ * and Morrow, 190" }
  *
  * Throws BadRequestError if no data is provided.
  */
